@@ -25,29 +25,19 @@ namespace LibraryServiceAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> getAllBooks()
         {
-            List<Book> books = null;
             HttpResponseMessage response = await client.GetAsync("api/v1/Books");
+            response.EnsureSuccessStatusCode();
 
-            if (response.IsSuccessStatusCode)
-            {
-                books = await response.Content.ReadAsAsync<List<Book>>();
-            }
-
-            return Ok(books);
+            return Ok(await response.Content.ReadAsStringAsync());
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> getBookById(int id)
         {
-            Book book = null;
             HttpResponseMessage response = await client.GetAsync($"api/v1/Books/{id}");
+            response.EnsureSuccessStatusCode();
 
-            if (response.IsSuccessStatusCode)
-            {
-                book = await response.Content.ReadAsAsync<Book>();
-            }
-
-            return Ok(book);
+            return Ok(await response.Content.ReadAsStringAsync());
         }
 
         [HttpPost]
@@ -66,9 +56,7 @@ namespace LibraryServiceAPI.Controllers
             HttpResponseMessage response = await client.PutAsJsonAsync($"api/v1/Books/{id}", book);
             response.EnsureSuccessStatusCode();
 
-            book = await response.Content.ReadAsAsync<Book>();
-          
-            return Ok(book);
+            return Ok(await response.Content.ReadAsStringAsync());
         }
 
         [HttpDelete("{id}")]
