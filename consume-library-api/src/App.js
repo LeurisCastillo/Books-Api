@@ -11,6 +11,9 @@ import {
 	Container,
 } from "reactstrap";
 import Swal from "sweetalert2";
+import axios from "axios";
+
+const url = "https://localhost:44331/api/Books";
 
 class App extends Component {
 	constructor(props) {
@@ -39,12 +42,19 @@ class App extends Component {
 	};
 
 	componentDidMount() {
-		fetch("https://localhost:44331/api/Books")
+		fetch(url)
 			.then((res) => res.json())
 			.then((result) => {
 				this.setState({
 					isLoaded: true,
 					items: result,
+				});
+			})
+			.catch((error) => {
+				Swal.fire({
+					icon: "error",
+					title: "Something went wrong!",
+					text: "The data could not be loaded",
 				});
 			});
 	}
@@ -65,12 +75,29 @@ class App extends Component {
 		this.setState({ editModal: false });
 	};
 
-	insertBook = () => {
-		var newData = { ...this.state.form };
-		newData.id = this.state.items.length + 1;
-		var list = this.state.items;
-		list.push(newData);
-		this.setState({ items: list, insertModal: false });
+	insertBook = async () => {
+		delete this.state.form.id;
+		await axios
+			.post(url, this.state.form)
+			.then((res) => {
+				var newData = { ...this.state.form };
+				newData.id = this.state.items.length + 1;
+				var list = this.state.items;
+				list.push(newData);
+				this.setState({ items: list, insertModal: false });
+
+				this.hideInsertModal();
+				Swal.fire("Success!", "The book has been added!", "success");
+			})
+			.catch((error) => {
+				this.hideInsertModal();
+
+				Swal.fire({
+					icon: "error",
+					title: "Oops...",
+					text: "Something went wrong!",
+				});
+			});
 	};
 
 	editBook = (data) => {
@@ -78,6 +105,19 @@ class App extends Component {
 		var list = this.state.items;
 		list.map((item) => {
 			if (data.id === item.id) {
+				axios
+					.put(`${url}/${this.state.form.id}`, this.state.form)
+					.then((res) => {})
+					.catch((error) => {
+						this.setState({ editModal: false });
+
+						Swal.fire({
+							icon: "error",
+							title: "Oops...",
+							text: "Something went wrong!",
+						});
+					});
+
 				list[counter].title = data.title;
 				list[counter].description = data.description;
 				list[counter].pageCount = data.pageCount;
@@ -101,14 +141,24 @@ class App extends Component {
 				var counter = 0;
 				var list = this.state.items;
 				list.map((item) => {
-					if (item.id === data.id) {
+					if (data.id === item.id) {
+						axios
+							.delete(`${url}/${counter + 1}`)
+							.then((res) => {})
+							.catch((error) => {
+								Swal.fire({
+									icon: "error",
+									title: "Oops...",
+									text: "Something went wrong!",
+								});
+							});
+
 						list.splice(counter, 1);
+						Swal.fire("Deleted!", "The book has been deleted.", "success");
 					}
 					counter++;
 				});
 				this.setState({ items: list });
-
-				Swal.fire("Deleted!", "The book has been deleted.", "success");
 			}
 		});
 	};
