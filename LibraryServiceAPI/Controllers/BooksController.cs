@@ -15,13 +15,11 @@ namespace LibraryServiceAPI.Controllers
     [ApiController]
     public class BooksController : ControllerBase
     {
-        readonly static HttpClient client = new HttpClient();
-
-        public BooksController()
+        private readonly HttpClient client;
+         
+        public BooksController(HttpClient httpClient)
         {
-            client.BaseAddress = new Uri("https://fakerestapi.azurewebsites.net/");
-            client.DefaultRequestHeaders.Accept.Add(
-                new MediaTypeWithQualityHeaderValue("application/json"));
+            client = httpClient;
         }
 
         [HttpGet]
