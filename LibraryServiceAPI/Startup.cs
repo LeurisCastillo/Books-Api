@@ -30,7 +30,10 @@ namespace LibraryServiceAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddCors(options => { options.AddPolicy(name: "Cors", builder => { builder.AllowAnyOrigin();});});
+            services.AddCors(options => { options.AddPolicy(name: "Cors", builder => { builder.AllowAnyOrigin();
+                builder.AllowAnyHeader();
+                builder.AllowAnyMethod();
+            });});
 
             services.AddHttpClient<BooksController>("books", client => {
 
