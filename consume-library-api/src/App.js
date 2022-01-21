@@ -12,10 +12,10 @@ class App extends Component {
 	componentDidMount() {
 		fetch("https://localhost:44331/api/Books")
 			.then((res) => res.json())
-			.then((json) => {
+			.then((result) => {
 				this.setState({
 					isLoaded: true,
-					items: json,
+					items: result,
 				});
 			});
 	}
@@ -29,6 +29,14 @@ class App extends Component {
 			return (
 				<div className="App">
 					<h1>Data has been loaded</h1>
+					<ul>
+						{items.map((item) => (
+							<li key={item.id}>
+								Title: {item.title} | Description:{" "}
+								{item.description.substring(0, 20)} | Pages: {item.pageCount}
+							</li>
+						))}
+					</ul>
 				</div>
 			);
 		}
